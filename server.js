@@ -1,7 +1,7 @@
 const express = require('express')
 const joyas = require('./data/joyas.js')
 const app = express()
-const {HATEOASV1, HATEOASV2, joyaIndividual, filterByCategory, orderValues} = require("./funciones")
+const {HATEOASV1, HATEOASV2, joyaIndividual, filterByCategory, orderValues, fieldsSelect} = require("./funciones")
 
 //Ruta raíz
 app.get('/', (req, res) => {
@@ -46,9 +46,15 @@ app.get("/api/v1/joya/:id", (req, res) => {
 })
 
 //Ruta que consulta la ID en su V2, con manejo de errores si no existe la ID de la joya
+//Contiene también filtrado por campos de la joya
+//http://localhost:3000/api/v2/joya/1?fields=id,name,metal,value <-- probar
 app.get("/api/v2/joya/:id", (req, res) => {
   const {id} = req.params
+  const {fields} = req.query
   const imprimirJoya = joyaIndividual(id)
+  console.log(fields)
+  if(fields) return res.send({joya: fieldsSelect(imprimirJoya, fields.split(","))})
+ 
   id <= joyas.results.length
     ? res.send(imprimirJoya)
     : res.status(404).send({
@@ -64,11 +70,11 @@ app.get("/api/v2/category/:category", (req, res) => {
   const filtro = filterByCategory(category)
   
   filtro.length !== 0
-    ?res.send({
+    ? res.send({
     cantidad: filtro.length,
     joyas: filtro
   })
-    :res.status(404).send({
+    : res.status(404).send({
       error: "Not Found",
       message: `La categoría '${category}' no existe`
     })

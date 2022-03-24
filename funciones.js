@@ -32,4 +32,11 @@ const orderValues = (order) => {
     : false
 }
 
-module.exports = {HATEOASV1, HATEOASV2, joyaIndividual, filterByCategory, orderValues}
+const fieldsSelect = (joya, fields) => {
+  for(propiedad in joya) {
+    if(!fields.includes(propiedad)) delete joya[propiedad]
+  }
+  return joya
+}
+
+module.exports = {HATEOASV1, HATEOASV2, joyaIndividual, filterByCategory, orderValues, fieldsSelect}
